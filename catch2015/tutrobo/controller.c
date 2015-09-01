@@ -13,45 +13,20 @@
 	#define 	RELATIVE	//自動化相対座標を基に制御
 
 int 	ad_data[4];
-int 	speed_timer;
+//int 	speed_timer;
 char 	pscon_err_flag=0;
-double 	max_speed;
-char 	shoot_flag_g=0;//発射が回り始めるフラグ
-char	rom_debug_flag=0;
-char	save_flag=0;
-char	load_flag=0;
-/*
-unsigned char half_1, half_2;
-unsigned char duty_L, degree_L, duty_R, degree_R;
-unsigned char D_direction_R, D_direction_L;
-unsigned char D_direction_U, D_direction_D;
-unsigned char sankaku, maru, batsu, shikaku;
-unsigned char L1, R1, L2, R2;
-*/
+//double 	max_speed;
+//char 	shoot_flag_g=0;//発射が回り始めるフラグ
+//char	rom_debug_flag=0;
+//char	save_flag=0;
+//char	load_flag=0;
+
+
 
 /*
-double real_spot1[4];//相対座標のための型
-double real_spot2[3];
-double real_spot3[3];
-double real_pass_field[3];
-*/
-
-
-
-
 		//赤ゾーン経路				x		y			角度		釣竿		
 auto_route 
-/*
-red = {
-{6296.04, -5449.12, -88.55, 3.07,  },
-{ 4840.80, -3486.19, 60.00, 1450.00,  },
-{ 4248.64, -3322.24, 60.00, 900.00,  },
-{ 3147.57, -1906.85, 60.00, 1300.00,  },
-{ 277.01, -351.19, 69.48, 1.84,  },
-{ 2988.84, 3078.23, 183.74, 3.07,  },
-{ 2680.00, 2872.95, 227.00, 1.84,  }
-};
-*/
+
 red = {
 {6278.85, -5431.03, -90.00, 0.00,  },
 { 4834.48, -3458.79, 60.00, 1450.00,  },
@@ -62,18 +37,7 @@ red = {
 { 2680.00, 2872.95, 227.00, 1.84,  },
 };
 auto_route 
-//前回/*
-/*
-blue = {
-{6375.65, 5482.00, 90.30, 2.45,  },
-{ 4750.31, 3566.08, -45.00, 1450.00,  },
-{ 4290.16, 3472.49, -45.00, 900.00,  },
-{ 3121.67, 1875.78, -45.00, 1300.00,  },
-{ 407.94, 300.00, -150.82, 1.84,  },
-{ 3135.96, -2827.43, -180.52, 3.68,  },
-{ 2750.00, -2750.07, -221.00, 0.61,  }
-};
-*/
+
 blue = {
 {6240.58, 5303.86, 90.00, -2.45,  },
 { 4779.23, 3471.63, -50.00, 1450.00,  },
@@ -83,6 +47,7 @@ blue = {
 { 3136.85, -2824.64, -186.53, 3.68,  },
 { 2750.00, -2750.07, -222.00, 0.61,  }
 };
+
 auto_route 
 current = {{ 0.0,0.0,0.0,0.0,  },
 { 0.0, 0.0, 0.0, 0.0,  },
@@ -92,6 +57,9 @@ current = {{ 0.0,0.0,0.0,0.0,  },
 { 0.0, 0.0, 0.0, 0.0,  },
 { 0.0, 0.0, 0.0, 0.0,  }};
 
+*/
+
+/*
 int fishing_rod,	//アーム系モーターに渡すdutyを収納する型
 	l_arm;
 					
@@ -124,6 +92,12 @@ char hand_R_position,//Rハンドの場所
 	 stopper_position;//ストッパーの場所
 char stopper_count;
 char senkai_stop_flag;
+*/
+
+int renc_x,renc_z;
+double duty_x,duty_z;//-100.0~100.0
+
+
 /********************************************************/
 //  名前      
 //		recieve_data_input
@@ -189,14 +163,8 @@ void set_duty(void)
 {
 	
 	how_about_sensor();//センサーの状態を確認
+	manual_ctrl();//手動操作
 	
-
-	
-	//アーム系デバッグのため
-//	set_duty_debug[0]=(double)fishing_rod;
-//	set_duty_debug[1]=l_arm;
-//	set_duty_debug[2]=direction_rad;
-
 }
 
 /********************************************************/
@@ -240,6 +208,103 @@ void input_PWM_ctrl(void)
 
 
 }
+
+void manual_ctrl(void)
+{
+	duty_x=PSstick_to_duty(DUTY_LY,6);
+	duty_z=PSstick_to_duty(DUTY_RY,6);
+	
+}
+/********************************************************/
+//  名前      
+//		how_about_sensor
+//	概要
+//		手動制御関連
+//	機能説明
+//		センサーの状態を確認
+//	作成者
+//		やまむろ
+/********************************************************/
+void how_about_sensor(void)
+{
+//	static int fish_ad[4];//移動平均フィルタのため
+//	static int l_ad[4];
+//	int i;
+//	double fish=0,l_arm=0;
+	encorder_count(MTU1.TCNT,MTU2.TCNT);
+	ad_load_4_7(ad_data);
+/*	
+	for(i=3;i>0;i--)
+	{
+		fish_ad[i]=fish_ad[i-1];
+		l_ad[i]=l_ad[i-1];
+	}
+	fish_ad[0]=ad_data[2];
+	l_ad[0]=ad_data[1];
+
+	fish=(double)(fish_ad[0]+fish_ad[1]+fish_ad[2]+fish_ad[3])/4.0;
+	l_arm=(double)(l_ad[0]+l_ad[1]+l_ad[2]+l_ad[3])/4.0;	
+	
+	l_arm_position = (l_arm-(double)L_arm_offset)*480.0*PI/1023.0;
+	fishing_rod_position = (fish-(double)fishing_rod_offset)*800.0*PI/1023.0;
+	
+	servo_position=how_about_servo();
+	stopper_position=how_about_stopper();
+	how_about_hand();
+	how_about_rom();
+*/
+
+}
+
+/********************************************************/
+//  名前      
+//		encorder_count
+//	概要
+//		renc_x,renc_zにエンコーダカウントの累積値を代入
+//	作成者
+//		やまむろ
+/********************************************************/
+void encorder_count(int enc_x,int enc_z)
+{
+	static int enc_x_,enc_z_;		//過去のエンコーダカウント
+
+	int diff_x =  (short)((unsigned short)enc_x - (unsigned short)enc_x_);		//エンコーダの回転の向きをここで補正する。
+	int diff_z =  (short)((unsigned short)enc_z - (unsigned short)enc_z_);		//エンコーダの回転の向きをここで補正する。
+	
+	renc_x += diff_x;			//左のエンコーダカウントの累積値
+	renc_z += diff_z;			//右のエンコーダカウントの累積値	
+	
+	enc_x_=enc_x;				//過去のエンコーダカウントを保存
+	enc_z_=enc_z;
+}
+/********************************************************/
+//  名前      
+//		PSstick_to_duty
+//	概要
+//		プレステコンのスティックの傾きをdutyに変換(thは中心からの+-閾値)
+//	作成者
+//		やまむろ
+/********************************************************/
+double PSstick_to_duty(int val,int th)
+{
+	double duty=0;
+	
+	if( (val>=127-th) && (val<=127+th) )duty=0.0;
+	else if(val<127)duty=-100.0*(127.0-(th+val))/(double)(127-th);
+	else if(val>127)duty= 100.0*(val-(127.0+th))/(double)(128-th);
+	
+	if(duty>100)duty=100;
+	else if(duty<-100)duty=-100;
+
+	return duty;
+}
+
+
+
+
+
+#if 0
+
 /********************************************************/
 //  名前      
 //		how_about_rom
@@ -248,6 +313,7 @@ void input_PWM_ctrl(void)
 //	作成者
 //		やまむろ
 /********************************************************/
+
 void how_about_rom(void)
 {
 	static int save_count,load_count;
@@ -287,51 +353,7 @@ void how_about_rom(void)
 
 /********************************************************/
 //  名前      
-//		how_about_sensor
-//	概要
-//		手動制御関連
-//	機能説明
-//		センサーの状態を確認
-//	パラメータ説明
-//		なし
-//	戻り値
-//		なし
-//	作成者
-//		やまむろ
-/********************************************************/
-void how_about_sensor(void)
-{
-	static int fish_ad[4];//移動平均フィルタのため
-	static int l_ad[4];
-	int i;
-	double fish=0,l_arm=0;
-	
-	ad_load_4_7(ad_data);
-	
-	for(i=3;i>0;i--)
-	{
-		fish_ad[i]=fish_ad[i-1];
-		l_ad[i]=l_ad[i-1];
-	}
-	fish_ad[0]=ad_data[2];
-	l_ad[0]=ad_data[1];
-
-	fish=(double)(fish_ad[0]+fish_ad[1]+fish_ad[2]+fish_ad[3])/4.0;
-	l_arm=(double)(l_ad[0]+l_ad[1]+l_ad[2]+l_ad[3])/4.0;	
-	
-	l_arm_position = (l_arm-(double)L_arm_offset)*480.0*PI/1023.0;
-	fishing_rod_position = (fish-(double)fishing_rod_offset)*800.0*PI/1023.0;
-	
-	servo_position=how_about_servo();
-	stopper_position=how_about_stopper();
-	how_about_hand();
-	how_about_rom();
-
-}
-
-/********************************************************/
-//  名前      
-//		how_about_servo
+//		how_about_stopper
 //	概要
 //		手動制御関連
 //	機能説明
@@ -475,3 +497,5 @@ void how_about_hand(void)
 	
 
 }
+
+#endif

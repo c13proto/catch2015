@@ -20,21 +20,24 @@ void set_duty(void);
 void input_PWM_ctrl(void);
 
 void how_about_sensor(void);
-char how_about_servo(void);
-char how_about_stopper(void);
-void how_about_hand(void);
-void suspension_system(void);
-void auto_suspension_system(void);
-void fishing_rod_system(void);
-void l_arm_system(void);
-void r_hand_system(void);
-void l_hand_system(void);
-void r_tower_system(void);
+void encorder_count(int enc_x,int enx_z);
+double PSstick_to_duty(int val,int th);
+void manual_ctrl(void);
+//char how_about_servo(void);
+//char how_about_stopper(void);
+//void how_about_hand(void);
+//void suspension_system(void);
+//void auto_suspension_system(void);
+//void fishing_rod_system(void);
+//void l_arm_system(void);
+//void r_hand_system(void);
+//void l_hand_system(void);
+//void r_tower_system(void);
 //void l_tower_system(void);
-void to_get_leaf(void);
-void to_set_leaf(void);
-void auto_direction_and_duty(double x,double y,double Kp,double Ki,double Kd);
-void speed_check(void);
+//void to_get_leaf(void);
+//void to_set_leaf(void);
+//void auto_direction_and_duty(double x,double y,double Kp,double Ki,double Kd);
+//void speed_check(void);
 
 
 /*
@@ -46,15 +49,15 @@ extern unsigned char sankaku, maru, batsu, shikaku;
 extern unsigned char L1, R1, L2, R2;
 */
 //extern double set_duty_debug[7];
-extern double max_speed;
-extern double kaiten;
-extern double choose_degree;//現在のマシンの絶対座標の軸を見る
-extern double direction_duty;//速度方向duty
-extern double fishing_rod_position,l_arm_position;
+//extern double max_speed;
+//extern double kaiten;
+//extern double choose_degree;//現在のマシンの絶対座標の軸を見る
+//extern double direction_duty;//速度方向duty
+//extern double fishing_rod_position,l_arm_position;
 
-extern int servo_status;//サーボの状態
+//extern int servo_status;//サーボの状態
 extern int ad_data[4];
-extern int speed_timer;
+//extern int speed_timer;
 
 /*
 extern int front_shift;
@@ -62,16 +65,18 @@ extern int front_shift;
 ,	//モーターに渡すdutyを収納する型
 			l_arm;
 */
-extern int fishing_rod,l_arm;
-extern char /*tower_L_status,*/tower_R_b_status,tower_R_t_status,hand_R_status,hand_L_status;
-extern char hand_R_position,hand_L_position,servo_position;
+//extern int fishing_rod,l_arm;
+//extern char /*tower_L_status,*/tower_R_b_status,tower_R_t_status,hand_R_status,hand_L_status;
+//extern char hand_R_position,hand_L_position,servo_position;
 extern char pscon_err_flag;
-extern char shoot_flag_g;
-extern char senkai_stop_flag;
-extern char	rom_debug_flag;
-extern char	save_flag,load_flag;
+//extern char shoot_flag_g;
+//extern char senkai_stop_flag;
+//extern char	rom_debug_flag;
+//extern char	save_flag,load_flag;
+//extern auto_route red,blue,current;
 
-extern auto_route red,blue,current; 
+extern int renc_x,renc_z;
+ 
 #define air_OPEN 	(1)
 #define air_CLOSE 	(-1*air_OPEN)
 #define air_DOWN  	(1)

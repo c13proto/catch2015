@@ -40,7 +40,7 @@
 
 
 
-
+/*
 void show_route(void)
 {
 	#if 1
@@ -66,7 +66,7 @@ void show_route(void)
 			
 	#endif
 }
-
+*/
 int main()
 {	
 	/********************* main文タスク選択 ここから*********************/
@@ -76,7 +76,7 @@ int main()
 //	#define ENC_CTRL_DEBUG		// エンコーダによるフィードバックのデバック
 //	#define MOTOR_DEBUG 		// MOTORのデバック
 //	#define OMUNI_DEBUG			// オムニのデバッグ(3つのduty)
-//	#define PSCON_DEBUG			// PSこん
+	#define PSCON_DEBUG			// PSこん
 //	#define R1350N_DEBUG		// ジャイロのデバッグ
 //	#define GMA860COND_DEBUG		// ジャイロMAP状態のデバッグ
 //	#define MACOND_DEBUG		// マシンコンディションのデバッグ
@@ -99,7 +99,7 @@ int main()
 //	#define LED_CTRL_DEBUG 		// LEDコントロールのデバック
 //	#define AIR_DEBUG			// AIRのでバック
 //	#define MODE_DEBUG			// モードのデバック
-	#define BUTTON_DEBUG		// ボタンのデバック
+//	#define BUTTON_DEBUG		// ボタンのデバック
 //	#define LIMIT_DEBUG			// リミットのデバック
 //	#define WDT_DEBUG			// ウォッチドックタイマのデバック
 
@@ -545,7 +545,7 @@ void debug(){
 		int loop;
 		/******* AD変換データのデバック(チャンネル4～チャンネル7) *******/
 		
-		//ad_load_4_7(ad_data);
+		ad_load_4_7(ad_data);
 		
 		for(loop = 4;loop <= 7;loop++)
 			printf("ad_data[%d] = %d\t",loop,ad_data[loop-4]);
