@@ -1,0 +1,7 @@
+-cpu=rx600
+-signed_char
+-lang=c
+-output=obj="C:\WorkSpace\catch2015\catch2015\Debug\controller.obj"
+-debug
+"C:\WorkSpace\catch2015\catch2015\tutrobo\controller.c"
+-nologo

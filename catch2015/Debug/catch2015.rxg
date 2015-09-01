@@ -1,0 +1,4 @@
+-cpu=rx600
+-signed_char
+-output="C:\WorkSpace\catch2015\catch2015\Debug\catch2015.lib"
+-head=runtime,math,mathf,stdio,stdlib,string,new
