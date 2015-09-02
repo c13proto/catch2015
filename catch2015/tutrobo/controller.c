@@ -94,9 +94,24 @@ char stopper_count;
 char senkai_stop_flag;
 */
 
-int renc_x,renc_z;
-double duty_x,duty_z;//-100.0~100.0
-
+arm_condition ARM_X={
+	0,		//エンコーダの累積値
+	0,		//座標[mm]
+	0,			//速度[mm/sec]
+	
+	1000.0,		//最大速度[mm/sec]
+	0,		//目標速度[mm/sec]
+	0		//現在かけているduty(-100~100)
+};
+arm_condition ARM_Z={
+	0,		//エンコーダの累積値
+	0,		//座標[mm]
+	0,			//速度[mm/sec]
+	
+	1000.0,		//最大速度[mm/sec]
+	0,		//目標速度[mm/sec]
+	0		//現在かけているduty(-100~100)
+};
 
 /********************************************************/
 //  名前      
@@ -162,32 +177,21 @@ void recieve_data_input(void)
 void set_duty(void)
 {
 	
-	how_about_sensor();//センサーの状態を確認
 	manual_ctrl();//手動操作
 	
 }
 
 /********************************************************/
-//  名前      
-//		manual_cntl
-//	概要
-//		手動制御関連
-//	機能説明
-//		プレステコンデータからdutyを計算しPWMを出力
-//	パラメータ説明
-//		なし
-//	戻り値
-//		なし
-//	作成者
-//		S.Baba @ TUTrobo
+//  名前      input_PWM_ctrl
+//  概要      dutyから各レジスタに対応した数値を格納
 /********************************************************/
 void input_PWM_ctrl(void)
 {
-	int duty_dc=ANTI_CYCLE*DUTY_LX/255;
-	int duty_sr=SERVO_CYCLE*DUTY_LX/255;
+	int duty_dc=ANTI_CYCLE*PSstick_to_duty(DUTY_LX,6)/100;
+	int duty_sr=SERVO_CYCLE*PSstick_to_duty(DUTY_LX,6)/100;
 	
-	MTU0.TGRA=duty_dc;
-	MTU0.TGRB=duty_dc;
+	MTU0.TGRA=ANTI_CYCLE*ARM_X.duty/100;
+	MTU0.TGRB=ANTI_CYCLE*ARM_Z.duty/100;
 	MTU0.TGRC=duty_dc;
 	MTU0.TGRD=duty_dc;
 	
@@ -211,72 +215,13 @@ void input_PWM_ctrl(void)
 
 void manual_ctrl(void)
 {
-	duty_x=PSstick_to_duty(DUTY_LY,6);
-	duty_z=PSstick_to_duty(DUTY_RY,6);
+	ARM_X.aim_v=PSstick_to_duty(DUTY_LY,6)*ARM_X.max_v/100.0;//PSコンの傾きからアームの目標速度計算
+	ARM_Z.aim_v=PSstick_to_duty(DUTY_RY,6)*ARM_Z.max_v/100.0;
 	
-}
-/********************************************************/
-//  名前      
-//		how_about_sensor
-//	概要
-//		手動制御関連
-//	機能説明
-//		センサーの状態を確認
-//	作成者
-//		やまむろ
-/********************************************************/
-void how_about_sensor(void)
-{
-//	static int fish_ad[4];//移動平均フィルタのため
-//	static int l_ad[4];
-//	int i;
-//	double fish=0,l_arm=0;
-	encorder_count(MTU1.TCNT,MTU2.TCNT);
-	ad_load_4_7(ad_data);
-/*	
-	for(i=3;i>0;i--)
-	{
-		fish_ad[i]=fish_ad[i-1];
-		l_ad[i]=l_ad[i-1];
-	}
-	fish_ad[0]=ad_data[2];
-	l_ad[0]=ad_data[1];
-
-	fish=(double)(fish_ad[0]+fish_ad[1]+fish_ad[2]+fish_ad[3])/4.0;
-	l_arm=(double)(l_ad[0]+l_ad[1]+l_ad[2]+l_ad[3])/4.0;	
-	
-	l_arm_position = (l_arm-(double)L_arm_offset)*480.0*PI/1023.0;
-	fishing_rod_position = (fish-(double)fishing_rod_offset)*800.0*PI/1023.0;
-	
-	servo_position=how_about_servo();
-	stopper_position=how_about_stopper();
-	how_about_hand();
-	how_about_rom();
-*/
-
+	ARM_X.duty=PID_control_d(ARM_X.aim_v,ARM_X.v,100.0,5.0,0.2,0,10.0,0);//目標速度と現在速度からPID制御でduty計算
+	ARM_Z.duty=PID_control_d(ARM_Z.aim_v,ARM_Z.v,100.0,5.0,0.2,0,10.0,1);
 }
 
-/********************************************************/
-//  名前      
-//		encorder_count
-//	概要
-//		renc_x,renc_zにエンコーダカウントの累積値を代入
-//	作成者
-//		やまむろ
-/********************************************************/
-void encorder_count(int enc_x,int enc_z)
-{
-	static int enc_x_,enc_z_;		//過去のエンコーダカウント
-
-	int diff_x =  (short)((unsigned short)enc_x - (unsigned short)enc_x_);		//エンコーダの回転の向きをここで補正する。
-	int diff_z =  (short)((unsigned short)enc_z - (unsigned short)enc_z_);		//エンコーダの回転の向きをここで補正する。
-	
-	renc_x += diff_x;			//左のエンコーダカウントの累積値
-	renc_z += diff_z;			//右のエンコーダカウントの累積値	
-	
-	enc_x_=enc_x;				//過去のエンコーダカウントを保存
-	enc_z_=enc_z;
-}
 /********************************************************/
 //  名前      
 //		PSstick_to_duty
@@ -299,7 +244,56 @@ double PSstick_to_duty(int val,int th)
 	return duty;
 }
 
+/********************************************************/
+//  名前      
+//		how_about_sensor
+//	概要
+//		手動制御関連
+//	機能説明
+//		センサーの状態を確認
+//	作成者
+//		やまむろ
+/********************************************************/
+void sensor_update(void)
+{
+	arm_condition_update(MTU1.TCNT,MTU2.TCNT);
+	ad_load_4_7(ad_data);
 
+}
+
+/********************************************************/
+//  名前      
+//		arm_condition_update
+//	概要
+//		アーム状態の更新
+//	作成者
+//		やまむろ
+/********************************************************/
+void arm_condition_update(int enc_x,int enc_z)
+{
+	static int enc_x_,enc_z_;		//過去のエンコーダカウント
+	
+	const int enc_pulse_x=800;		//1回転あたりのエンコーダパルス数
+	const int enc_pulse_z=800;
+	const double circ_x=50.0*PI;	//1回転辺りに進む距離[mm]
+	const double circ_z=50.0*PI;
+
+	int diff_x =  (short)((unsigned short)enc_x - (unsigned short)enc_x_);		//エンコーダの回転の向きをここで補正する。
+	int diff_z =  (short)((unsigned short)enc_z - (unsigned short)enc_z_);		//エンコーダの回転の向きをここで補正する。
+		
+	ARM_X.renc += diff_x;			//エンコーダカウントの累積値
+	ARM_Z.renc += diff_z;				
+		
+	ARM_X.pos=ARM_X.renc*circ_x/(double)enc_pulse_x;//累積値から現在位置の計算
+	ARM_Z.pos=ARM_Z.renc*circ_z/(double)enc_pulse_z;
+	
+	ARM_X.v=diff_x*(circ_x/(double)enc_pulse_x)/(cmt1_counter*0.01);//速度計算[mm/sec]
+	ARM_Z.v=diff_z*(circ_z/(double)enc_pulse_z)/(cmt1_counter*0.01);
+	cmt1_counter=0;
+	
+	enc_x_=enc_x;				//過去のエンコーダカウントを保存
+	enc_z_=enc_z;
+}
 
 
 

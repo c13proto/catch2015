@@ -1,4 +1,4 @@
-Optimizing Linkage Editor (V.10.02.00.000)        01-Sep-2015 19:40:56
+Optimizing Linkage Editor (V.10.02.00.000)        02-Sep-2015 16:25:05
 
 *** Options ***
 
@@ -59,11 +59,11 @@ B_2
 R_2
                                   00001092  0000109f         e   2
 B
-                                  000010a0  00001a97       9f8   4
+                                  000010a0  00001ad7       a38   4
 R
-                                  00001a98  00001c6f       1d8   4
+                                  00001ad8  00001ce3       20c   4
 SI
-                                  00001c70  00001f6f       300   4
+                                  00001ce4  00001fe3       300   4
 PResetPRG
                                   ffff8000  ffff8029        2a   1
 C_1
@@ -83,18 +83,18 @@ D_1
 D_2
                                   ffff884a  ffff8857         e   2
 D
-                                  ffff8858  ffff8a2f       1d8   4
+                                  ffff8858  ffff8a63       20c   4
 P
-                                  ffff8a30  ffffafe1      25b2   1
+                                  ffff8a64  ffffb1ff      279c   1
 PIntPRG
-                                  ffffafe2  ffffb17d       19c   1
+                                  ffffb200  ffffb39b       19c   1
 W_1
-                                  ffffb17e  ffffb17e         0   1
+                                  ffffb39c  ffffb39c         0   1
 W_2
-                                  ffffb17e  ffffb17e         0   2
+                                  ffffb39c  ffffb39c         0   2
 W
-                                  ffffb180  ffffb180         0   4
+                                  ffffb39c  ffffb39c         0   4
 L
-                                  ffffb180  ffffb1d3        54   4
+                                  ffffb39c  ffffb3ef        54   4
 FIXEDVECT
                                   ffffffd0  ffffffff        30   4

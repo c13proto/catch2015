@@ -53,6 +53,6 @@ void R1350N(unsigned char c);			// ジャイロ
 
 extern int angle,accX,accY,accZ;//ジャイロの情報。角度、加速度
 extern int m_angle;//角度
-//extern int cmt1_counter;//タイマ割り込みに入った回数を数える
+extern int cmt1_counter;//タイマ割り込みに入った回数を数える
 
 #endif	//__INTPRG_H__

@@ -19,8 +19,8 @@
 void set_duty(void);
 void input_PWM_ctrl(void);
 
-void how_about_sensor(void);
-void encorder_count(int enc_x,int enx_z);
+void sensor_update(void);
+void arm_condition_update(int enc_x,int enx_z);
 double PSstick_to_duty(int val,int th);
 void manual_ctrl(void);
 //char how_about_servo(void);
@@ -74,8 +74,7 @@ extern char pscon_err_flag;
 //extern char	rom_debug_flag;
 //extern char	save_flag,load_flag;
 //extern auto_route red,blue,current;
-
-extern int renc_x,renc_z;
+extern arm_condition ARM_X,ARM_Z;
  
 #define air_OPEN 	(1)
 #define air_CLOSE 	(-1*air_OPEN)

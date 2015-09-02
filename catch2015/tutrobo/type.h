@@ -80,6 +80,17 @@ struct machine_condition {
 	DOUBLE_GEAR		diff_gear;	//フィードバックゲイン(差動)
 	DOUBLE_GEAR		speed_gear;	//フィードバックゲイン(速度)		
 };
+
+typedef struct {
+	int				renc;		//エンコーダの累積値
+	double			pos;		//座標[mm]
+	double			v;			//速度[mm/sec]
+	
+	double			max_v;		//最大速度[(+-)mm/sec]
+	double			aim_v;		//目標速度[mm/sec]
+	double			duty;		//現在かけているduty(-100~100)
+}arm_condition;
+
 /********************************************************/
 //  TUTrobo
 //

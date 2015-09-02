@@ -273,3 +273,37 @@ int PID_control(double mokuhyou,double position,int max_duty,double Kp,double Ki
 	return duty[num];
 	
 }
+double PID_control_d(double mokuhyou,double position,double max_duty,double Kp,double Ki,double Kd,double I_reset_range,char num)
+{
+	double duty[4];
+	static double comp_P[4],comp_I[4],comp_D[4];//P,I,D成分
+	static double old_position[4],old_mokuhyou[4];//過去の座標、目標座標
+	
+	if(old_mokuhyou[num] != mokuhyou)//目標座標が変わったらP,I,D成分を初期化
+	{
+		comp_P[num]=0.0;
+		comp_I[num]=0.0;
+		comp_D[num]=0.0;
+		old_position[num]=0.0;
+		old_mokuhyou[num]=0.0;
+	}
+	
+	comp_P[num] = Kp*(mokuhyou - position);
+	comp_I[num] +=Ki*comp_P[num];
+	comp_D[num] = Kd*(position-old_position[num]);
+	
+	if(ABS(mokuhyou-position)<=I_reset_range)comp_I[num]=0.0;//ある程度近づいたらI成分を初期化する（ほとんどの操作はこれをするべき？）
+		
+	duty[num] = comp_P[num] + comp_I[num] + comp_D[num];//int型に治すときに四捨五入したいので0.5を足している
+	
+	if(duty[num]>max_duty)duty[num]=max_duty;//頭打ち
+	if(duty[num]<-max_duty)duty[num]=-max_duty;//底打ち
+	
+	old_position[num] = position;
+	old_mokuhyou[num] = mokuhyou;
+	
+//	printf("%.1f\t%.1f\t%.1f\n",mokuhyou,position,comp_P[num]);
+	
+	return duty[num];
+	
+}

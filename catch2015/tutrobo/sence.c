@@ -11,6 +11,7 @@
 
 #define LATCH_CNT	10000					//ラッチのカウント数(カウント数×タスク周期[ms])
 
+
 /********************************************************/
 //  名前      
 //		show_macond
@@ -113,109 +114,7 @@ void show_macond(void)
 }
 
 
-/********************************************************/
-//  名前      
-//		gyro_map
-//  概要
-// 		計測関連
-//  機能説明
-//		ジャイロのカウントを読み取る
-//		カウントからマシンコンディションを求める。
-//  パラメタ説明
-//		なし
-//  戻り値
-//		なし
-//  作成者
-//		TUTrobo
-//
-/********************************************************/
-#if 0
-void gyro_map(void)	//右,左を入れ替えるとx,y軸が入れ替わる
-{
-//	#define loop_time 0.01 //タイマ割り込みの入る周期
-	
-//	static double old_ax,old_ay;
-//	static double old_vx,old_vy;
-	
-	static double test_ax[10];
-	static double test_ay[10];//オフセットのための型
-	static double offset_ax;
-	static double offset_ay;
-	
-	int i;
-	double ax_max,ax_min,ay_max,ay_min;
-	double m_angle_rad;
-	
-	 m_angle_rad = (double)m_angle*PI/18000.0;
-	
-	for(i=0;i<9;i++)//過去10個分の値を見る
-	{
-		test_ax[9-i]=test_ax[8-i];	//printf("[%d]=%.2f\n",9-i,test_ax[9-i]);
-		test_ay[9-i]=test_ay[8-i];	//printf("[%d]=%.2f\n",9-i,test_ay[9-i]);
-	}
-	test_ax[0]=(double)accX/100.0;
-	test_ay[0]=(double)accY/100.0;
-	
-	//printf("[0]=%.2f\n",test_ay[0]);
-	
-	ax_max=test_ax[0];ax_min=test_ax[0];
-	ay_max=test_ay[0];ay_min=test_ay[0];
-	
-	
-	for(i=0;i<=9;i++)//過去10個分の値から最大と最小を割り出す
-	{
-		if(test_ax[i]>ax_max)ax_max=test_ax[i];
-		if(test_ax[i]<ax_min)ax_min=test_ax[i];
-		if(test_ay[i]>ay_max)ay_max=test_ay[i];
-		if(test_ay[i]<ay_min)ay_min=test_ay[i];
-	}
-	
-//	printf("x_max=%.2f\t",ax_max);
-//	printf("x_min=%.2f\t",ax_min);
-//	printf("ax=%.2f\n",(double)accX/100.0);
-	
-	
-	if( ABS(ax_max-ax_min)<0.1)offset_ax=test_ax[0];//maxとminの差が少なければ今の値をオフセットとして代入
-	if( ABS(ay_max-ay_min)<0.1)offset_ay=test_ay[0];
-	
 
-	gcond.ax=test_ax[0]-offset_ax;//加速度[m/s^2]の代入(オフセットをどうするか)
-	gcond.ay=test_ay[0]-offset_ay;
-	
-	gcond.m_ax=gcond.ax*mycos(m_angle_rad)-gcond.ay*mysin(m_angle_rad);
-	gcond.m_ay=gcond.ax*mysin(m_angle_rad)+gcond.ay*mycos(m_angle_rad);
-
-	gcond.a_rad=atan3(gcond.m_ay,gcond.m_ax)+PI;//プレスとコンの入力と比較できるよう、0~2PIにする。
-
-/*	
-//	printf("ax=%.2f\n",gcond.ax);ok!
-//	printf("old_ax=%.2f\n",old_ax);ok!
-//	printf("ax=%.2f\t,off_ax=%.2f\n",test_ax[0],offset_ax);
-//	printf("ay=%.2f\t,off_ay=%.2f\n",test_ay[0],offset_ay);
-
-
-//	printf("%f\t",gcond.vx);
-	
-	gcond.vx += old_ax*loop_time*1000.0;//速度[mm/s]の計算
-	gcond.vy += old_ay*loop_time*1000.0;
-	gcond.v  = sqrt( POW2(gcond.vx) + POW2(gcond.vy) );
-	gcond.v_rad=atan2(gcond.vy,gcond.vx);//速度方向の角度の計算
-	
-//	printf("%f\n",old_ax*0.010*1000.0);
-//	printf("%f\n",gcond.vx);
-
-	
-	gcond.x += old_vx*loop_time;//x座標[mm]の計算
-	gcond.y += old_vy*loop_time;
-	
-	
-	old_ax=gcond.ax;
-	old_ay=gcond.ay;
-	old_vx=gcond.vx;
-	old_vy=gcond.vy;		
-*/
-}
-#endif
 /********************************************************/
 //  名前      
 //		map_update
@@ -535,3 +434,107 @@ double slip_stoper(double aim_duty,DOUBLE_LR ratio)
 	
 	return drive;
 }
+
+/********************************************************/
+//  名前      
+//		gyro_map
+//  概要
+// 		計測関連
+//  機能説明
+//		ジャイロのカウントを読み取る
+//		カウントからマシンコンディションを求める。
+//  パラメタ説明
+//		なし
+//  戻り値
+//		なし
+//  作成者
+//		TUTrobo
+//
+/********************************************************/
+#if 0
+void gyro_map(void)	//右,左を入れ替えるとx,y軸が入れ替わる
+{
+//	#define loop_time 0.01 //タイマ割り込みの入る周期
+	
+//	static double old_ax,old_ay;
+//	static double old_vx,old_vy;
+	
+	static double test_ax[10];
+	static double test_ay[10];//オフセットのための型
+	static double offset_ax;
+	static double offset_ay;
+	
+	int i;
+	double ax_max,ax_min,ay_max,ay_min;
+	double m_angle_rad;
+	
+	 m_angle_rad = (double)m_angle*PI/18000.0;
+	
+	for(i=0;i<9;i++)//過去10個分の値を見る
+	{
+		test_ax[9-i]=test_ax[8-i];	//printf("[%d]=%.2f\n",9-i,test_ax[9-i]);
+		test_ay[9-i]=test_ay[8-i];	//printf("[%d]=%.2f\n",9-i,test_ay[9-i]);
+	}
+	test_ax[0]=(double)accX/100.0;
+	test_ay[0]=(double)accY/100.0;
+	
+	//printf("[0]=%.2f\n",test_ay[0]);
+	
+	ax_max=test_ax[0];ax_min=test_ax[0];
+	ay_max=test_ay[0];ay_min=test_ay[0];
+	
+	
+	for(i=0;i<=9;i++)//過去10個分の値から最大と最小を割り出す
+	{
+		if(test_ax[i]>ax_max)ax_max=test_ax[i];
+		if(test_ax[i]<ax_min)ax_min=test_ax[i];
+		if(test_ay[i]>ay_max)ay_max=test_ay[i];
+		if(test_ay[i]<ay_min)ay_min=test_ay[i];
+	}
+	
+//	printf("x_max=%.2f\t",ax_max);
+//	printf("x_min=%.2f\t",ax_min);
+//	printf("ax=%.2f\n",(double)accX/100.0);
+	
+	
+	if( ABS(ax_max-ax_min)<0.1)offset_ax=test_ax[0];//maxとminの差が少なければ今の値をオフセットとして代入
+	if( ABS(ay_max-ay_min)<0.1)offset_ay=test_ay[0];
+	
+
+	gcond.ax=test_ax[0]-offset_ax;//加速度[m/s^2]の代入(オフセットをどうするか)
+	gcond.ay=test_ay[0]-offset_ay;
+	
+	gcond.m_ax=gcond.ax*mycos(m_angle_rad)-gcond.ay*mysin(m_angle_rad);
+	gcond.m_ay=gcond.ax*mysin(m_angle_rad)+gcond.ay*mycos(m_angle_rad);
+
+	gcond.a_rad=atan3(gcond.m_ay,gcond.m_ax)+PI;//プレスとコンの入力と比較できるよう、0~2PIにする。
+
+/*	
+//	printf("ax=%.2f\n",gcond.ax);ok!
+//	printf("old_ax=%.2f\n",old_ax);ok!
+//	printf("ax=%.2f\t,off_ax=%.2f\n",test_ax[0],offset_ax);
+//	printf("ay=%.2f\t,off_ay=%.2f\n",test_ay[0],offset_ay);
+
+
+//	printf("%f\t",gcond.vx);
+	
+	gcond.vx += old_ax*loop_time*1000.0;//速度[mm/s]の計算
+	gcond.vy += old_ay*loop_time*1000.0;
+	gcond.v  = sqrt( POW2(gcond.vx) + POW2(gcond.vy) );
+	gcond.v_rad=atan2(gcond.vy,gcond.vx);//速度方向の角度の計算
+	
+//	printf("%f\n",old_ax*0.010*1000.0);
+//	printf("%f\n",gcond.vx);
+
+	
+	gcond.x += old_vx*loop_time;//x座標[mm]の計算
+	gcond.y += old_vy*loop_time;
+	
+	
+	old_ax=gcond.ax;
+	old_ay=gcond.ay;
+	old_vx=gcond.vx;
+	old_vy=gcond.vy;		
+*/
+}
+#endif
