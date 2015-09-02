@@ -97,18 +97,28 @@ char senkai_stop_flag;
 arm_condition ARM_X={
 	0,		//エンコーダの累積値
 	0,		//座標[mm]
-	0,			//速度[mm/sec]
+	0,		//速度[mm/sec]
 	
 	1000.0,		//最大速度[mm/sec]
 	0,		//目標速度[mm/sec]
 	0		//現在かけているduty(-100~100)
 };
-arm_condition ARM_Z={
+arm_condition ARM_K={
 	0,		//エンコーダの累積値
-	0,		//座標[mm]
-	0,			//速度[mm/sec]
+	0,		//座標[degree]
+	0,		//角速度[degree/sec]
 	
-	1000.0,		//最大速度[mm/sec]
+	120.0,	//最大角速度[deg/sec]
+	0,		//目標角速度[mm/sec]
+	0		//現在かけているduty(-100~100)
+};
+
+arm_condition ARM_Z={
+	0,		//adの累積値
+	0,		//座標[mm]
+	0,		//速度[mm/sec]
+	
+	1000.0,	//最大速度[mm/sec]
 	0,		//目標速度[mm/sec]
 	0		//現在かけているduty(-100~100)
 };
@@ -192,7 +202,7 @@ void input_PWM_ctrl(void)
 	
 	MTU0.TGRA=ANTI_CYCLE*ARM_X.duty/100;
 	MTU0.TGRB=ANTI_CYCLE*ARM_Z.duty/100;
-	MTU0.TGRC=duty_dc;
+	MTU0.TGRC=ANTI_CYCLE*ARM_K.duty/100;
 	MTU0.TGRD=duty_dc;
 	
 	MTU4.TGRA=duty_dc;
@@ -215,13 +225,42 @@ void input_PWM_ctrl(void)
 
 void manual_ctrl(void)
 {
-	ARM_X.aim_v=PSstick_to_duty(DUTY_LY,6)*ARM_X.max_v/100.0;//PSコンの傾きからアームの目標速度計算
-	ARM_Z.aim_v=PSstick_to_duty(DUTY_RY,6)*ARM_Z.max_v/100.0;
-	
-	ARM_X.duty=PID_control_d(ARM_X.aim_v,ARM_X.v,100.0,5.0,0.2,0,10.0,0);//目標速度と現在速度からPID制御でduty計算
-	ARM_Z.duty=PID_control_d(ARM_Z.aim_v,ARM_Z.v,100.0,5.0,0.2,0,10.0,1);
+	arm_k_ctrl();//回転アームの制御
+	arm_xz_ctrl();//XZアームの制御
 }
 
+void arm_xz_ctrl(void)
+{
+	
+	if(PSCON_PRE_R1>0)//R1が押されている間はセンサの情報を用いた制御をしない
+	{
+		ARM_X.duty=PSstick_to_duty(DUTY_LY,6)/100.0;
+		ARM_Z.duty=PSstick_to_duty(DUTY_RY,6)/100.0;
+	}
+	else
+	{
+		ARM_X.aim_v=PSstick_to_duty(DUTY_LY,6)*ARM_X.max_v/100.0;//PSコンの傾きからアームの目標速度計算
+		ARM_Z.aim_v=PSstick_to_duty(DUTY_RY,6)*ARM_Z.max_v/100.0;
+		ARM_X.duty=PID_control_d(ARM_X.aim_v,ARM_X.v,100.0,2.0,0.1,0,10.0,0);//目標速度[mm/sec]と現在速度からPID制御でduty計算
+		ARM_Z.duty=PID_control_d(ARM_Z.aim_v,ARM_Z.v,100.0,2.0,0.1,0,10.0,1);
+	}
+}
+void arm_k_ctrl(void)
+{
+	if(PSCON_PRE_R1>0)//R1が押されている間はセンサの情報を用いた制御をしない
+	{
+		if(D_direction_U>0)ARM_K.duty=10.0;
+		else if(D_direction_D>0)ARM_K.duty=-10.0;
+		else ARM_K.duty=0.0;
+	}
+	else
+	{
+		if(D_direction_U>0)ARM_K.aim_v=ARM_K.max_v;
+		else if(D_direction_D>0)ARM_K.aim_v=-ARM_K.max_v;
+		else ARM_K.aim_v=0.0;
+		ARM_K.duty=PID_control_d(ARM_K.aim_v,ARM_K.v,30.0,0.1,0.01,0,10.0,2);//目標角速度[deg/sec]と現在角速度からPID制御でduty計算
+	}
+}
 /********************************************************/
 //  名前      
 //		PSstick_to_duty
@@ -256,9 +295,9 @@ double PSstick_to_duty(int val,int th)
 /********************************************************/
 void sensor_update(void)
 {
-	arm_condition_update(MTU1.TCNT,MTU2.TCNT);
 	ad_load_4_7(ad_data);
-
+	arm_condition_update(MTU1.TCNT,MTU2.TCNT,ad_data[0]);
+	
 }
 
 /********************************************************/
@@ -269,30 +308,37 @@ void sensor_update(void)
 //	作成者
 //		やまむろ
 /********************************************************/
-void arm_condition_update(int enc_x,int enc_z)
+void arm_condition_update(int enc1,int enc2,int ad)
 {
-	static int enc_x_,enc_z_;		//過去のエンコーダカウント
+	static int enc1_,enc2_,ad_;		//過去のエンコーダカウント
 	
-	const int enc_pulse_x=800;		//1回転あたりのエンコーダパルス数
-	const int enc_pulse_z=800;
-	const double circ_x=50.0*PI;	//1回転辺りに進む距離[mm]
-	const double circ_z=50.0*PI;
+	const int enc_pulse1=800;		//1回転あたりのエンコーダパルス数
+	const int enc_pulse2=800;
+	const int ad_initial=10;		//ad変換での初期位置
+	
+	const double circ1=50.0*PI;	//1回転辺りに進む距離[mm]
+	const double circ_ad=50.0*PI;
 
-	int diff_x =  (short)((unsigned short)enc_x - (unsigned short)enc_x_);		//エンコーダの回転の向きをここで補正する。
-	int diff_z =  (short)((unsigned short)enc_z - (unsigned short)enc_z_);		//エンコーダの回転の向きをここで補正する。
+	int diff_x =  (short)((unsigned short)enc1 - (unsigned short)enc1_);		//エンコーダの回転の向きをここで補正する。
+	int diff_k =  (short)((unsigned short)enc2 - (unsigned short)enc2_);		//エンコーダの回転の向きをここで補正する。
+	int diff_ad = ad - ad_;		//速度調べるためadでも差分は必要。
 		
 	ARM_X.renc += diff_x;			//エンコーダカウントの累積値
-	ARM_Z.renc += diff_z;				
-		
-	ARM_X.pos=ARM_X.renc*circ_x/(double)enc_pulse_x;//累積値から現在位置の計算
-	ARM_Z.pos=ARM_Z.renc*circ_z/(double)enc_pulse_z;
+	ARM_K.renc += diff_k;
+	ARM_Z.renc += diff_ad;			//ポテンショなので要らないけど一応とってみる
+					
+	ARM_X.pos=ARM_X.renc*circ1/(double)enc_pulse1;//累積値から現在位置の計算
+	ARM_K.pos=ARM_K.renc*360.0/(double)enc_pulse2;//累積値から現在角度の計算
+	ARM_Z.pos=(ad-ad_initial)*circ_ad/10.23;//10回転ポテンショなので1回転で10.23
 	
-	ARM_X.v=diff_x*(circ_x/(double)enc_pulse_x)/(cmt1_counter*0.01);//速度計算[mm/sec]
-	ARM_Z.v=diff_z*(circ_z/(double)enc_pulse_z)/(cmt1_counter*0.01);
+	ARM_X.v=diff_x*(circ1/(double)enc_pulse1)/(cmt1_counter*0.01);//速度計算[mm/sec]
+	ARM_K.v=diff_k*(360.0/(double)enc_pulse2)/(cmt1_counter*0.01);
+	ARM_Z.v=diff_ad*(circ_ad/10.23)/(cmt1_counter*0.01);
 	cmt1_counter=0;
 	
-	enc_x_=enc_x;				//過去のエンコーダカウントを保存
-	enc_z_=enc_z;
+	enc1_=enc1;				//過去のエンコーダカウントを保存
+	enc2_=enc2;
+	ad_=ad;
 }
 
 

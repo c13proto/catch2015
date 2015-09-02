@@ -20,9 +20,11 @@ void set_duty(void);
 void input_PWM_ctrl(void);
 
 void sensor_update(void);
-void arm_condition_update(int enc_x,int enx_z);
+void arm_condition_update(int enc1,int enc2,int ad);
 double PSstick_to_duty(int val,int th);
 void manual_ctrl(void);
+void arm_k_ctrl(void);//回転アームの制御
+void arm_xz_ctrl(void);//XZアームの制御
 //char how_about_servo(void);
 //char how_about_stopper(void);
 //void how_about_hand(void);
@@ -74,7 +76,7 @@ extern char pscon_err_flag;
 //extern char	rom_debug_flag;
 //extern char	save_flag,load_flag;
 //extern auto_route red,blue,current;
-extern arm_condition ARM_X,ARM_Z;
+extern arm_condition ARM_X,ARM_K,ARM_Z;
  
 #define air_OPEN 	(1)
 #define air_CLOSE 	(-1*air_OPEN)
