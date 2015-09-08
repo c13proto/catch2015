@@ -1,45 +1,45 @@
-Optimizing Linkage Editor (V.10.02.00.000)        02-Sep-2015 20:18:05
+Optimizing Linkage Editor (V.10.02.00.000)        07-Sep-2015 19:43:56
 
 *** Options ***
 
--subcommand=C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\catch2015.hlk
+-subcommand=C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\catch2015.hlk
 -noprelink
 -rom=D=R,D_1=R_1,D_2=R_2
 -nomessage
--list="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\catch2015.map"
+-list="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\catch2015.map"
 -nooptimize
 -start=B_1,R_1,B_2,R_2,B,R,SU,SI/01000,PResetPRG/0FFFF8000,C_1,C_2,C,C$*,D_1,D_2,D,P,PIntPRG,W*,L/0FFFF8100,FIXEDVECT/0FFFFFFD0
 -nologo
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\ad.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\calc.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\cet.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\clock.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\cmt.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\common.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\comu2.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\control.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\controller.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\dbsct.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\enc.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\feedback.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\fld.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\interrupt.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\intprg.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\io.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\main.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\omuni.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\path.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\pwm.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\resetprg.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\sbrk.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\sci.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\sence.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\setup.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\table.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\vecttbl.obj"
--input="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\wdt.obj"
--library="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\catch2015.lib"
--output="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\catch2015.abs"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\ad.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\calc.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\cet.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\clock.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\cmt.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\common.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\comu2.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\control.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\controller.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\dbsct.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\enc.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\feedback.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\fld.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\interrupt.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\intprg.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\io.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\main.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\omuni.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\path.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\pwm.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\resetprg.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\sbrk.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\sci.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\sence.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\setup.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\table.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\vecttbl.obj"
+-input="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\wdt.obj"
+-library="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\catch2015.lib"
+-output="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\catch2015.abs"
 -end
 
 *** Error information ***
@@ -51,19 +51,19 @@ Optimizing Linkage Editor (V.10.02.00.000)        02-Sep-2015 20:18:05
 SECTION                            START      END         SIZE   ALIGN
 
 B_1
-                                  00001000  0000101d        1e   1
+                                  00001000  00001021        22   1
 R_1
-                                  0000101e  0000106a        4d   1
+                                  00001022  00001072        51   1
 B_2
-                                  0000106c  00001091        26   2
+                                  00001074  00001099        26   2
 R_2
-                                  00001092  0000109f         e   2
+                                  0000109a  000010a7         e   2
 B
-                                  000010a0  00001adb       a3c   4
+                                  000010a8  00001b27       a80   4
 R
-                                  00001adc  00001cff       224   4
+                                  00001b28  00001d53       22c   4
 SI
-                                  00001d00  00001fff       300   4
+                                  00001d54  00002053       300   4
 PResetPRG
                                   ffff8000  ffff8029        2a   1
 C_1
@@ -79,22 +79,22 @@ C$BSEC
 C$VECT
                                   ffff83fc  ffff87fb       400   4
 D_1
-                                  ffff87fc  ffff8848        4d   1
+                                  ffff87fc  ffff884c        51   1
 D_2
-                                  ffff884a  ffff8857         e   2
+                                  ffff884e  ffff885b         e   2
 D
-                                  ffff8858  ffff8a7b       224   4
+                                  ffff885c  ffff8a87       22c   4
 P
-                                  ffff8a7c  ffffb34d      28d2   1
+                                  ffff8a88  ffffb8e4      2e5d   1
 PIntPRG
-                                  ffffb34e  ffffb4e9       19c   1
+                                  ffffb8e5  ffffba80       19c   1
 W_1
-                                  ffffb4ea  ffffb4ea         0   1
+                                  ffffba81  ffffba81         0   1
 W_2
-                                  ffffb4ea  ffffb4ea         0   2
+                                  ffffba82  ffffba82         0   2
 W
-                                  ffffb4ec  ffffb4ec         0   4
+                                  ffffba84  ffffba84         0   4
 L
-                                  ffffb4ec  ffffb53f        54   4
+                                  ffffba84  ffffbae7        64   4
 FIXEDVECT
                                   ffffffd0  ffffffff        30   4

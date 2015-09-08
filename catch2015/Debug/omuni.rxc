@@ -1,7 +1,7 @@
 -cpu=rx600
 -signed_char
 -lang=c
--output=obj="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\omuni.obj"
+-output=obj="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\omuni.obj"
 -debug
-"C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\tutrobo\omuni.c"
+"C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\tutrobo\omuni.c"
 -nologo

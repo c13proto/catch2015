@@ -70,21 +70,20 @@ void show_route(void)
 int main()
 {	
 	/********************* main文タスク選択 ここから*********************/
-
+	#define CUSTOMIZE_DEBUG		// 色々、その時次第
 //	#define GAME				// 試合	
 //	#define ENCODER_DEBUG		// ENCODERのデバック
 //	#define ENC_CTRL_DEBUG		// エンコーダによるフィードバックのデバック
 //	#define MOTOR_DEBUG 		// MOTORのデバック
 //	#define OMUNI_DEBUG			// オムニのデバッグ(3つのduty)
-	#define PSCON_DEBUG			// PSこん
+//	#define PSCON_DEBUG			// PSこん
 //	#define R1350N_DEBUG		// ジャイロのデバッグ
-//	#define GMA860COND_DEBUG		// ジャイロMAP状態のデバッグ
+//	#define GMA860COND_DEBUG	// ジャイロMAP状態のデバッグ
 //	#define MACOND_DEBUG		// マシンコンディションのデバッグ
 //	#define OMUNI_RES			// オムニの補正値だし
 //	#define POSITION_DEBUG		// 自動化のための位置出し
 //	#define CURRENT_DEBUG		// 相対位置
 //	#define SPEED_CHECK			// 速さチェック
-//	#define CUSTOMIZE_DEBUG		// 色々、その時次第
 //	#define PSCON_HALF_DEBUG	// halfのデバッグ
 //	#define SUSPENTION_DEBUG	// 足回りのデバック
 //	#define TOWER_DEBUG			// タワーのデバック
@@ -197,18 +196,11 @@ int main()
 	return 0;
 }		
 void debug(){
-/*
-	int pwm;					// PWMのデバックのため pwm値格納用
-	double duty;				// dutyのデバックのため
-//	int ad_data[4];				// ad_data格納のため
-	int send_buff;				// 出力関数のため(データ)
-	int delay_count1;			// delaytimeのため
-	int delay_count2;			// delaytimeのため
-*/
+
 
 #ifdef	CUSTOMIZE_DEBUG
 {
-		//printf("%4d,%4d,%4d,%4d,\n",DUTY_LX,DUTY_LY,DUTY_RX,DUTY_RY);//\rないとスペースはいる
+		printf("%.2f,%.2f,%.2f\n",ARM_X.pos,ARM_Z.pos,ARM_K.pos);//\rないとスペースはいる
 }
 #endif
 
@@ -635,12 +627,12 @@ printf("TGT:%.1f, C0:%.1f, C1:%.1f, C2:%.1f, D0:%.1f, D1:%.1f, D2:%.1f, E2:%d \n
 {
 		/*********************** ボタンのデバック ***********************/
 		printf("%d %d %d %d %d %d %d %d\n",
-INPUT_PIN(PORTE,0),
+INPUT_PIN(PORTE,0),//Xアームの後ろ
 INPUT_PIN(PORTE,1),
 INPUT_PIN(PORTE,2),
 INPUT_PIN(PORTE,3),
-INPUT_PIN(PORTE,5),//リーフ
-INPUT_PIN(PORTE,6),//リーフ
+INPUT_PIN(PORTE,5),//
+INPUT_PIN(PORTE,6),//
 INPUT_PIN(PORTE,7));
 		/*********************** ボタンのデバック ***********************/
 }

@@ -17,14 +17,26 @@
 //      コントローラー設定 プロトタイプ宣言
 /********************************************************/
 void set_duty(void);
-void input_PWM_ctrl(void);
-
+void input_register_ctrl(void);
 void sensor_update(void);
+double average_4(int data,char ch);
 void arm_condition_update(int enc1,int enc2,int ad);
 double PSstick_to_duty(int val,int th);
+
+void duty_limit_ctrl(void);
+void arm_k_limit(void);
+void arm_xz_limit(void);
+void auto_ctrl(void);
+void task1(void);
+void task_servo(void);
+void task_final(void);
+
 void manual_ctrl(void);
 void arm_k_ctrl(void);//回転アームの制御
 void arm_xz_ctrl(void);//XZアームの制御
+void air_ctrl(void);
+void servo_x_ctrl();//servo_x
+void servo_lr_ctrl();//servo_lr
 //char how_about_servo(void);
 //char how_about_stopper(void);
 //void how_about_hand(void);
@@ -77,22 +89,35 @@ extern char pscon_err_flag;
 //extern char	save_flag,load_flag;
 //extern auto_route red,blue,current;
 extern arm_condition ARM_X,ARM_K,ARM_Z;
+extern char AIR_STATUS;
+extern char SERVO_X_STATUS;
+extern char SERVO_LR_STATUS;
  
-#define air_OPEN 	(1)
-#define air_CLOSE 	(-1*air_OPEN)
-#define air_DOWN  	(1)
-#define air_UP 	 	(-1*air_DOWN)
-#define air_MIDDLE 	(0)
+#define PSCON_TH	35
+#define OPEN 	(1)
+#define CLOSE 	(-1*OPEN)
+//#define air_OPEN 	(1)
+//#define air_CLOSE 	(-1*air_OPEN)
+//#define air_DOWN  	(1)
+//#define air_UP 	 	(-1*air_DOWN)
+//#define air_MIDDLE 	(0)
 
 //#define SERVO_T_OPEN 	4000//仮のOPEN値
 //#define SERVO_T_CLOSE	500//仮のCLOSE値
-#define SERVO_B_OPEN 	4912//2350//仮のOPEN値
-#define SERVO_B_CLOSE	2520//1000//CLOSE値
+//#define SERVO_B_OPEN 	4912//2350//仮のOPEN値
+//#define SERVO_B_CLOSE	2520//1000//CLOSE値
 //#define SERVO_B_OVER 	6300//2350//仮のOPEN値
 
-#define SERVO_T_OPEN 	4281//OPEN値
-#define SERVO_T_CLOSE	7155//CLOSE値
+//#define SERVO_T_OPEN 	4281//OPEN値
+//#define SERVO_T_CLOSE	7155//CLOSE値
 //#define SERVO_T_OVER 	6300//2350//仮のOPEN値
+
+#define SERVO_X_OPEN	6125//初期
+#define SERVO_X_CLOSE	3448
+#define SERVO_L_CLOSE	4043//初期
+#define SERVO_L_OPEN	5642
+#define SERVO_R_CLOSE	3761//初期
+#define SERVO_R_OPEN	4827
 
 
 #endif//__CONTLOLLER_H__

@@ -1,7 +1,7 @@
 -cpu=rx600
 -signed_char
 -lang=c
--output=obj="C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\Debug\sence.obj"
+-output=obj="C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\Debug\sence.obj"
 -debug
-"C:\Users\idry7lash629\Documents\GitHub\C\catch2015\catch2015\tutrobo\sence.c"
+"C:\Users\idry7lash629\Google ドライブ\workspace\robocon\catch2015\catch2015\tutrobo\sence.c"
 -nologo
