@@ -26,6 +26,7 @@ double PSstick_to_duty(int val,int th);
 void duty_limit_ctrl(void);
 void arm_k_limit(void);
 void arm_xz_limit(void);
+void K_pos_fix(void);
 void auto_ctrl(void);
 void task1(void);
 void task_servo(void);

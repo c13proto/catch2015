@@ -99,7 +99,7 @@ arm_condition ARM_X={
 	0,		//座標[mm]
 	0,		//速度[mm/sec]
 	
-	1000.0,		//最大速度[mm/sec]
+	500.0,		//最大速度[mm/sec]
 	0,		//目標速度[mm/sec]
 	0		//現在かけているduty(-100~100)
 };
@@ -108,7 +108,7 @@ arm_condition ARM_K={
 	0,		//座標[degree]
 	0,		//角速度[degree/sec]
 	
-	120.0,	//最大角速度[deg/sec]
+	720.0,	//最大角速度[deg/sec]
 	0,		//目標角速度[mm/sec]
 	0		//現在かけているduty(-100~100)
 };
@@ -126,6 +126,9 @@ arm_condition ARM_Z={
 char AIR_STATUS=OPEN;//初期状態;
 char SERVO_X_STATUS=OPEN;//初期状態;
 char SERVO_LR_STATUS=CLOSE;//初期状態;
+
+const double GER_DEG=190.0;
+const double THROW_DEG=-17.0;
 /********************************************************/
 //  名前      
 //		recieve_data_input
@@ -190,9 +193,9 @@ void recieve_data_input(void)
 void set_duty(void)
 {
 	
-	manual_ctrl();//手動操作
+	if(PSCON_PRE_L1==0)manual_ctrl();//手動操作
 	auto_ctrl();//自動操作
-	if(PSCON_PRE_R1==0)	duty_limit_ctrl();//条件によってリミットをかける
+	if(PSCON_PRE_R1==0)duty_limit_ctrl();//R1押してない時リミットをかける
 }
 
 /********************************************************/
@@ -200,13 +203,13 @@ void set_duty(void)
 //  概要      dutyから各レジスタに対応した数値を格納
 /********************************************************/
 void input_register_ctrl(void)
-{
+{//ここで正転逆転反転
 	int duty_dc=anti_lock_pwm(0.3*PSstick_to_duty(DUTY_LY,PSCON_TH));
 	int duty_sr=SERVO_UP*ad_data[0]/1023.0;//servo_pwm(100.0*ad_data[0]/1023.0);//servo_pwm(PSstick_to_duty(DUTY_LX,PSCON_TH));
 //DCモータ
 	MTU0.TGRA=anti_lock_pwm(ARM_X.duty);
 	MTU0.TGRB=anti_lock_pwm(ARM_Z.duty);
-	MTU0.TGRC=anti_lock_pwm(ARM_K.duty);
+	MTU0.TGRC=anti_lock_pwm(-ARM_K.duty);//
 	MTU0.TGRD=duty_dc;
 	
 	MTU4.TGRA=duty_dc;
@@ -242,39 +245,49 @@ void duty_limit_ctrl(void)
 {
 	arm_xz_limit();
 	arm_k_limit();
+	K_pos_fix();//ARM_Kのdutyが入っていない時にポジションを固定する制御
 }
 void arm_k_limit(void)
 {
-	const double max_deg = 195.0;
-	const double min_deg = -35.0;
 
-	if (ARM_K.pos > max_deg && ARM_K.duty > 0)ARM_K.duty = 0;
-	if (ARM_K.pos < min_deg && ARM_K.duty < 0)ARM_K.duty = 0;
+	if (ARM_K.pos > GER_DEG && ARM_K.duty > 0)ARM_K.duty = -2.5;
+	if (ARM_K.pos < THROW_DEG && ARM_K.duty < 0)ARM_K.duty = 2.5;
 
 }
 void arm_xz_limit(void)
 {
 	const double x_front_limit = 788.66;
 	const double z_down_limit = 541.0;
-	const double z_common = 459.9;//zがコレより下じゃないとコモンゾーン上に干渉
-	const double x_common = 553.46;//xがコレより奥だとコモンゾーンと干渉
-	const double z_lear = 0.0;//zがこれより上じゃないと手前の組付けに干渉
-	const double x_lear = 464.03;//xがコレより手前だと手前の組付けに干渉
+	const double z_common = 450.0;//zがコレより下じゃないとコモンゾーン上に干渉
+	const double x_common = 535.0;//xがコレより奥だとコモンゾーンと干渉
+	const double z_lear = 30.0;//zがこれより上じゃないと手前の組付けに干渉
+	const double x_lear = 475.0;//xがコレより手前だと手前の組付けに干渉
 
-	
 	//Xアーム
-	if (ARM_X.pos < 0 && ARM_X.duty < 0)ARM_X.duty = 0;//アームX後ろリミット
-	if (ARM_X.pos > x_front_limit && ARM_X.duty>0)ARM_X.duty = 0;//アームX前リミット
-	if (ARM_Z.pos<z_common && ARM_X.pos>x_common && ARM_X.duty > 0)ARM_X.duty = 0;//コモンゾーンとの干渉防止
-	if (ARM_Z.pos>z_lear && ARM_X.pos<x_lear && ARM_X.duty < 0)ARM_X.duty = 0;//組み付け位置や壁との干渉防止
+	if (ARM_X.pos < 0 && ARM_X.duty < 0)ARM_X.duty = 0.0;//アームX後ろリミット
+	if (ARM_X.pos > x_front_limit && ARM_X.duty>0)ARM_X.duty = -0.0;//アームX前リミット
+	if (ARM_Z.pos<z_common && ARM_X.pos>x_common && ARM_X.duty > 0)ARM_X.duty = -1.0;//コモンゾーンとの干渉防止
+	if (ARM_Z.pos>z_lear && ARM_X.duty < 0)ARM_X.duty = 1.0;//組み付け位置や壁との干渉防止
 	//Zアーム
-	if (ARM_Z.pos < 0 && ARM_Z.duty < 0)ARM_Z.duty = 0;//アームZ上リミット
-	if (ARM_Z.pos > z_down_limit && ARM_Z.duty>0)ARM_Z.duty = 0;//アームZ下リミット
-	if (ARM_X.pos > x_common && ARM_Z.pos < z_common && ARM_Z.duty < 0)ARM_Z.duty = 0;//コモンゾーンとの干渉防止
-	if (ARM_X.pos < x_lear && ARM_Z.duty > 0)ARM_Z.duty = 0;//組み付け位置との干渉防止
+	if (ARM_Z.pos < 0 && ARM_Z.duty < 0)ARM_Z.duty = 0.0;//アームZ上リミット
+	if (ARM_Z.pos > z_down_limit && ARM_Z.duty>0)ARM_Z.duty = -0.0;//アームZ下リミット
+	if (ARM_X.pos > x_common && ARM_Z.pos < z_common && ARM_Z.duty < 0)ARM_Z.duty = 0.0;//コモンゾーンとの干渉防止
+	if (ARM_X.pos < x_lear && ARM_Z.pos<z_lear && ARM_Z.duty > 0)ARM_Z.duty = -0.0;//組み付け位置との干渉防止(上から↓)
+	if (ARM_X.pos < x_lear && ARM_Z.pos>350.0 && ARM_Z.duty<0)ARM_Z.duty=0.0;
 
 }
+void K_pos_fix(void)
+{
+	static double k_pos;
+	static double old_k_duty;
+	
+	if(ARM_K.duty==0&&old_k_duty!=0)k_pos=ARM_K.pos;//dutyが入っていない最初のポジションを格納
+	old_k_duty=ARM_K.duty;//フィードバック計算前のduty
+	
+	if(ARM_K.duty==0)ARM_K.duty=PID_control_d(k_pos,ARM_K.pos,10,1.0,0.075,0.0,0.0,3);
+	
 
+}
 //--------------------------------------
 //自動
 //-------------------------------------
@@ -295,19 +308,43 @@ void auto_ctrl(void)
 }
 void task1(void)
 {
-	const double get_deg = 195.0;
-	const double throw_deg = -35.0;
+	const double max_k=2000.0;
+	const double stopper_out=49.05;
 	static int air_count = 0;
 	const int interval = 15;//0.15sで保持
 
-	if (AIR_STATUS == OPEN&&air_count == 0)ARM_K.duty = PID_control_d(get_deg, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);//取得位置まで回転
-	else if (ABS(ARM_K.pos - get_deg) < 5.0 && ABS(ARM_K.v) < 20.0)//オブジェクト取得
+	if (AIR_STATUS == OPEN&&air_count == 0 && ABS(ARM_K.pos - GER_DEG) > 10.0)
+	{
+		
+		//ARM_K.duty = PID_control_d(get_deg, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);//取得位置まで回転(duty制御)
+		if(ARM_K.pos<stopper_out)ARM_K.duty=40.0;
+		else
+		{
+			//double duty=PID_control_d(get_deg, ARM_K.pos, 100.0, 1.0, 0, 0, 1.0, 0);//取得位置まで回転(速度制御)
+			ARM_K.aim_v=360.0;
+			ARM_K.duty=ARM_K.aim_v*100.0/max_k+PID_control_d(ARM_K.aim_v,ARM_K.v,30.0,0.05,0,0,10.0,0);//目標角速度[deg/sec]と現在角速度からPID制御でduty計算
+			if(ARM_K.pos>GER_DEG-5.0)ARM_K.duty=0;
+		}
+	}
+	else if (air_count<interval)//オブジェクト取得
 	{
 		AIR_STATUS = CLOSE;
 		air_count++;
 	}
-	else if (air_count>interval)ARM_K.duty = PID_control_d(throw_deg, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);//解放位置まで回転
-	else if (ARM_K.pos < -10.0)AIR_STATUS = OPEN;
+	else if (ARM_K.pos > -10.0)
+	{
+		//ARM_K.duty = PID_control_d(THROW_DEG, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);//解放位置まで回転
+		
+		//double duty=PID_control_d(THROW_DEG, ARM_K.pos, 100.0, 1.0, 0, 0, 1.0, 0);//解放位置まで回転(速度制御)
+		//ARM_K.aim_v=ARM_K.max_v*duty/100.0;
+		//ARM_K.duty=ARM_K.aim_v*100.0/max_k+PID_control_d(ARM_K.aim_v,ARM_K.v,10.0,0.1,0,0,10.0,0);//目標角速度[deg/sec]と現在角速度からPID制御でduty計算
+		ARM_K.duty=-50.0;
+	}
+	else
+	{
+		AIR_STATUS = OPEN;
+		ARM_K.duty=0;
+	}
 }
 void task_servo(void)
 {
@@ -376,43 +413,42 @@ void air_ctrl(void)
 }
 void arm_xz_ctrl(void)
 {
-	double max_x=1500.0;//Duty100での速度[mm/s]
-	double max_z=2000.0;
+	double max_x=1394.9;//Duty100での速度[mm/s]
+	double max_z=1000.0;
 	
 	if(PSCON_PRE_R1>0)//R1が押されている間はセンサの情報を用いた制御をしない
 	{
-		ARM_X.duty=PSstick_to_duty(DUTY_LY,PSCON_TH);
-		ARM_Z.duty=PSstick_to_duty(DUTY_RY,PSCON_TH);
+		ARM_X.duty=0.3*PSstick_to_duty(DUTY_LY,PSCON_TH);
+		ARM_Z.duty=-0.3*PSstick_to_duty(DUTY_RY,PSCON_TH);
 	}
 	else
 	{
 		ARM_X.aim_v=PSstick_to_duty(DUTY_LY,PSCON_TH)*ARM_X.max_v/100.0;//PSコンの傾きからアームの目標速度計算
 		ARM_Z.aim_v=-PSstick_to_duty(DUTY_RY,PSCON_TH)*ARM_Z.max_v/100.0;//↓が正
 		
-		ARM_X.duty = ARM_X.aim_v*100.0 / max_x;// +PID_control_d(ARM_X.aim_v, ARM_X.v, 30.0, 0.05, 0.0, 0, 10.0, 0);//目標速度[mm/sec]と現在速度からPID制御でduty計算
-		ARM_Z.duty = ARM_Z.aim_v*100.0 / max_z;// +PID_control_d(ARM_Z.aim_v, ARM_Z.v, 30.0, 0.05, 0, 0, 10.0, 1);
+		ARM_X.duty = ARM_X.aim_v*100.0 / max_x;// +PID_control_d(ARM_X.aim_v, ARM_X.v, 30.0, 0.05, 0.0, 0, 10.0, 1);//目標速度[mm/sec]と現在速度からPID制御でduty計算
+		ARM_Z.duty = ARM_Z.aim_v*100.0 / max_z;// +PID_control_d(ARM_Z.aim_v, ARM_Z.v, 30.0, 0.05, 0, 0, 10.0, 2);
 	}
 }
 void arm_k_ctrl(void)
 {
-	double max_k=3550.0;//duty100での角速度[deg/s]
-	const double get_degree = 195.0;
-	const double throw_degree = -35.0;
+	double max_k=2000.0;//duty100での角速度[deg/s]
 	
 	if(PSCON_PRE_R1>0)//R1が押されている間はセンサの情報を用いた制御をしない
 	{
-		if(D_direction_R>0)ARM_K.duty=10.0;
-		else if(D_direction_L>0)ARM_K.duty=-10.0;
+		if(D_direction_R>0)ARM_K.duty=100.0;
+		else if(D_direction_L>0)ARM_K.duty=-100.0;
 		else ARM_K.duty=0.0;
 	}
 	else
 	{
-		//if(D_direction_U>0)ARM_K.aim_v=ARM_K.max_v;
-		//else if(D_direction_D>0)ARM_K.aim_v=-ARM_K.max_v;
-		//else ARM_K.aim_v=0.0;
-		//ARM_K.duty=ARM_K.aim_v*100.0/max_k+PID_control_d(ARM_K.aim_v,ARM_K.v,30.0,0.01,0,0,10.0,0);//目標角速度[deg/sec]と現在角速度からPID制御でduty計算
-		if (D_direction_R>0)ARM_K.duty=PID_control_d(get_degree, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);
-		else if (D_direction_L>0)ARM_K.duty = PID_control_d(throw_degree, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);
+		if(D_direction_R>0)ARM_K.aim_v=ARM_K.max_v;
+		else if(D_direction_L>0)ARM_K.aim_v=-ARM_K.max_v;
+		else ARM_K.aim_v=0.0;
+		ARM_K.duty=ARM_K.aim_v*100.0/max_k+PID_control_d(ARM_K.aim_v,ARM_K.v,10.0,0.1,0,0,10.0,0);//目標角速度[deg/sec]と現在角速度からPID制御でduty計算
+		if(ARM_K.aim_v==0)ARM_K.duty=0;
+		//if (D_direction_R>0)ARM_K.duty=PID_control_d(GER_DEG, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);
+		//else if (D_direction_L>0)ARM_K.duty = PID_control_d(THROW_DEG, ARM_K.pos, 10.0, 0.1, 0, 0, 1.0, 0);
 	}
 }
 /********************************************************/
@@ -490,7 +526,7 @@ void arm_condition_update(int enc1,int enc2,int ad)
 	
 	const int enc_pulse1=4000;		//1回転あたりのエンコーダパルス数
 	const int enc_pulse2=4000;
-	const int ad_initial=137;		//ad変換での初期位置
+	const int ad_initial=317;		//ad変換での初期位置
 	
 	const double circ1=48.0*PI;	//1回転辺りに進む距離[mm]
 	const double circ_ad=48.0*PI;

@@ -200,7 +200,7 @@ void debug(){
 
 #ifdef	CUSTOMIZE_DEBUG
 {
-		printf("%.2f,%.2f,%.2f\n",ARM_X.pos,ARM_Z.pos,ARM_K.pos);//\rないとスペースはいる
+		printf("%.2f\t,%.2f\t,%.2f\t,%.2f\t,%.2f\t,%.2f\t\n",ARM_K.v,ARM_K.pos,ARM_K.duty);//\rないとスペースはいる
 }
 #endif
 
