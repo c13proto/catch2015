@@ -200,7 +200,8 @@ void debug(){
 
 #ifdef	CUSTOMIZE_DEBUG
 {
-		printf("%.2f\t,%.2f\t,%.2f\t,%.2f\t,%.2f\t,%.2f\t\n",ARM_K.v,ARM_K.pos,ARM_K.duty);//\rないとスペースはいる
+		printf("%.2f\t,%.2f\t,%.2f\t,%.2f\t,%.2f\t,%.2f\t\n",ARM_X.pos,ARM_X.duty,ARM_Z.pos,ARM_Z.duty,ARM_K.pos,ARM_K.duty);//\rないとスペースはいる
+		//printf("%d\n",(int)(SERVO_UP*ad_data[1]/1023.0));
 }
 #endif
 

@@ -26,11 +26,12 @@ double PSstick_to_duty(int val,int th);
 void duty_limit_ctrl(void);
 void arm_k_limit(void);
 void arm_xz_limit(void);
-void K_pos_fix(void);
 void auto_ctrl(void);
 void task1(void);
-void task_servo(void);
+void task_center(void);
+void task_home(void);
 void task_final(void);
+void auto_xz_ctrl(double pos_x,double pos_z,double duty_x,double duty_z);
 
 void manual_ctrl(void);
 void arm_k_ctrl(void);//‰ñ“]ƒA[ƒ€‚Ì§Œä
@@ -115,8 +116,8 @@ extern char SERVO_LR_STATUS;
 
 #define SERVO_X_OPEN	6125//‰Šú
 #define SERVO_X_CLOSE	3448
-#define SERVO_L_CLOSE	4043//‰Šú
-#define SERVO_L_OPEN	5642
+#define SERVO_L_CLOSE	3623//‰Šú
+#define SERVO_L_OPEN	5761
 #define SERVO_R_CLOSE	3761//‰Šú
 #define SERVO_R_OPEN	4827
 
