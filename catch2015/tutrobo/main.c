@@ -631,7 +631,7 @@ printf("TGT:%.1f, C0:%.1f, C1:%.1f, C2:%.1f, D0:%.1f, D1:%.1f, D2:%.1f, E2:%d \n
 INPUT_PIN(PORTE,0),//Xアームの後ろ
 INPUT_PIN(PORTE,1),
 INPUT_PIN(PORTE,2),
-INPUT_PIN(PORTE,3),
+INPUT_PIN(PORTE,3),//トグルスイッチ
 INPUT_PIN(PORTE,5),//
 INPUT_PIN(PORTE,6),//
 INPUT_PIN(PORTE,7));
